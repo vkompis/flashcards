@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <title>Lær norsk med flashcards🇳🇴🎉</title>
+  <style>
+    /* Body with a soft gradient background */
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      color: #4CAF50;
+      margin-top: 20px;
+    }
+    .selector, .interface-toggle {
+      margin: 10px;
+      font-size: 18px;
+    }
+    .container {
+      width: 320px;
+      margin: 30px auto;
+      border: 2px solid #4CAF50;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      background-color: #fff;
+      padding: 20px;
+    }
+    /* Flashcard styling with 3D effect */
+    .flashcard {
+      position: relative;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    .card {
+      width: 100%;
+      height: 200px;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      position: relative;
+      display: flex;
+    }
+    .card.flip {
+      transform: rotateY(180deg);
+    }
+    .card-side {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-sizing: border-box;
+      border-radius: 10px;
+    }
+    .card-front {
+      background-color: #e3f2fd;
+    }
+    .card-back {
+      background-color: #ffecb3;
+      transform: rotateY(180deg);
+    }
+    .word {
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+      margin: 0 10px;
+    }
+    /* Navigation buttons styling */
+    .buttons {
+      margin-top: 20px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      margin: 0 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .instruction {
+      font-style: italic;
+      color: #666;
+      margin-top: 10px;
+    }
+    /* Instructions container styling */
+    #instructionsContainer {
+      display: none;
+      border: 1px solid #ccc;
+      margin: 20px auto;
+      width: 300px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f9f9f9;
+      text-align: left;
+    }
+    #instructionsContainer p {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    #closeInstrBtn {
+      background-color: #d9534f;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      font-size: 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #closeInstrBtn:hover {
+      background-color: #c9302c;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="pageTitle">Lær norsk med flashcards🇳🇴🎉</h1>
+  
+  <!-- Global interface language toggle -->
+  <div class="interface-toggle">
+    <button id="toggleInterfaceBtn">Перейти на українську</button>
+    <button id="showInstructionsBtn">Vis instruksjoner</button>
+  </div>
+  
+  <!-- Flashcard language variant selector -->
+  <div class="selector">
+    <label for="languageSelector" id="variantLabel">Velg språkvariant:</label>
+    <select id="languageSelector">
+      <option value="bokmal" selected>Bokmål</option>
+      <option value="nynorsk">Nynorsk</option>
+    </select>
+  </div>
+  
+  <div class="container">
+    <div class="flashcard" id="flashcard">
+      <div class="card" id="card">
+        <!-- Front: Displays the Norwegian word with an emoji -->
+        <div class="card-side card-front" id="cardFront">
+          <div class="word" id="norwegianWord"></div>
+        </div>
+        <!-- Back: Reveals the Ukrainian translation -->
+        <div class="card-side card-back" id="cardBack">
+          <div class="word" id="ukrainianWord"></div>
+        </div>
+      </div>
+    </div>
+    <div class="instruction" id="flipInstruction">Klikk på kortet for å snu det og se oversettelsen! 🔄</div>
+    <div class="buttons">
+      <button id="prevBtn">Forrige</button>
+      <button id="nextBtn">Neste</button>
+    </div>
+  </div>
+  
+  <!-- Hidden instructions container -->
+  <div id="instructionsContainer">
+    <p id="instructionsText"></p>
+    <button id="closeInstrBtn">Lukk</button>
+  </div>
+  
+  <script>
+    // Global interface language (default: norwegian)
+    let interfaceLang = "norwegian";
+
+    // Interface text for both languages
+    const interfaceTexts = {
+      norwegian: {
+        title: "Lær norsk med flashcards🇳🇴🎉",
+        chooseVariant: "Velg språkvariant:",
+        instruction: "Klikk på kortet for å snu det og se oversettelsen! 🔄",
+        prev: "Forrige",
+        next: "Neste",
+        // Toggle button text in Norwegian interface is in Ukrainian
+        toggleInterface: "Перейти на українську",
+        instructionsButton: "Vis instruksjoner",
+        instructionsContent: "Instruksjoner: Klikk på kortet for å snu det og se oversettelsen. Bruk knappene 'Forrige' og 'Neste' for å bla gjennom ordene. Du kan også velge språkvariant øverst for å bytte mellom Bokmål og Nynorsk."
+      },
+      ukrainian: {
+        title: "Вчи норвезьку з flashcards🇺🇦🎉",
+        chooseVariant: "Виберіть варіант мови:",
+        instruction: "Натисніть на картку, щоб перевернути її та побачити переклад! 🔄",
+        prev: "Попередня",
+        next: "Наступна",
+        toggleInterface: "Перемкнути на норвезьку",
+        instructionsButton: "Показати інструкції",
+        instructionsContent: "Інструкції: Натисніть на картку, щоб перевернути її та побачити переклад. Використовуйте кнопки 'Попередня' та 'Наступна' для перегляду слів. Також ви можете вибрати мовний варіант зверху для перемикання між Bokmål та Nynorsk."
+      }
+    };
+
+    // Flashcard data: Over 50 words with Bokmål, Nynorsk, Ukrainian translations, and an emoji.
+    const flashcards = [
+      { bokmal: "Hund",    nynorsk: "Hund",    ukrainian: "Собака",          emoji: "🐶" },
+      { bokmal: "Katt",    nynorsk: "Katt",    ukrainian: "Кіт",             emoji: "🐱" },
+      { bokmal: "Fugl",    nynorsk: "Fugl",    ukrainian: "Птах",            emoji: "🐦" },
+      { bokmal: "Sol",     nynorsk: "Sol",     ukrainian: "Сонце",           emoji: "☀️" },
+      { bokmal: "Tre",     nynorsk: "Tre",     ukrainian: "Дерево",          emoji: "🌳" },
+      { bokmal: "Hus",     nynorsk: "Hus",     ukrainian: "Будинок",         emoji: "🏠" },
+      { bokmal: "Vann",    nynorsk: "Vatn",    ukrainian: "Вода",            emoji: "💧" },
+      { bokmal: "Brød",    nynorsk: "Brød",    ukrainian: "Хліб",            emoji: "🍞" },
+      { bokmal: "Melk",    nynorsk: "Mjólk",   ukrainian: "Молоко",          emoji: "🥛" },
+      { bokmal: "Eple",    nynorsk: "Eple",    ukrainian: "Яблуко",          emoji: "🍎" },
+      { bokmal: "Bok",     nynorsk: "Bok",     ukrainian: "Книга",           emoji: "📚" },
+      { bokmal: "Stol",    nynorsk: "Stol",    ukrainian: "Стілець",         emoji: "🪑" },
+      { bokmal: "Bord",    nynorsk: "Bord",    ukrainian: "Стіл",            emoji: "🍽️" },
+      { bokmal: "Bil",     nynorsk: "Bil",     ukrainian: "Автомобіль",      emoji: "🚗" },
+      { bokmal: "Sykkel",  nynorsk: "Sykkel",  ukrainian: "Велосипед",       emoji: "🚲" },
+      { bokmal: "Skole",   nynorsk: "Skule",   ukrainian: "Школа",           emoji: "🏫" },
+      { bokmal: "Lærer",   nynorsk: "Lærar",   ukrainian: "Вчитель",         emoji: "👩‍🏫" },
+      { bokmal: "Elev",    nynorsk: "Elev",    ukrainian: "Учень",           emoji: "👨‍🎓" },
+      { bokmal: "Solskinn",nynorsk: "Solskin", ukrainian: "Сонячне світло",   emoji: "🌞" },
+      { bokmal: "Blomst",  nynorsk: "Blome",   ukrainian: "Квітка",          emoji: "🌸" },
+      { bokmal: "Gress",   nynorsk: "Gress",   ukrainian: "Трава",           emoji: "🌱" },
+      { bokmal: "Sky",     nynorsk: "Sky",     ukrainian: "Хмара",           emoji: "☁️" },
+      { bokmal: "Regn",    nynorsk: "Regn",    ukrainian: "Дощ",             emoji: "🌧️" },
+      { bokmal: "Snø",     nynorsk: "Snø",     ukrainian: "Сніг",            emoji: "❄️" },
+      { bokmal: "Venn",    nynorsk: "Venn",    ukrainian: "Друг",            emoji: "🤝" },
+      { bokmal: "Familie", nynorsk: "Familie", ukrainian: "Родина",          emoji: "👨‍👩‍👧‍👦" },
+      { bokmal: "Mat",     nynorsk: "Mat",     ukrainian: "Їжа",             emoji: "🍲" },
+      { bokmal: "Drikke",  nynorsk: "Drikke",  ukrainian: "Напій",           emoji: "🥤" },
+      { bokmal: "Ferie",   nynorsk: "Ferie",   ukrainian: "Відпустка",       emoji: "🏖️" },
+      { bokmal: "Hånd",    nynorsk: "Hand",    ukrainian: "Рука",            emoji: "✋" },
+      { bokmal: "Fot",     nynorsk: "Fot",     ukrainian: "Нога",            emoji: "👣" },
+      { bokmal: "Hode",    nynorsk: "Hode",    ukrainian: "Голова",          emoji: "👤" },
+      { bokmal: "Øye",     nynorsk: "Auge",    ukrainian: "Око",             emoji: "👁️" },
+      { bokmal: "Øre",     nynorsk: "Øre",     ukrainian: "Вухо",            emoji: "👂" },
+      { bokmal: "Nese",    nynorsk: "Nese",    ukrainian: "Ніс",             emoji: "👃" },
+      { bokmal: "Munn",    nynorsk: "Munn",    ukrainian: "Рот",             emoji: "👄" },
+      { bokmal: "Hjerte",  nynorsk: "Hjarte",  ukrainian: "Серце",           emoji: "❤️" },
+      { bokmal: "Farge",   nynorsk: "Farge",   ukrainian: "Колір",           emoji: "🎨" },
+      { bokmal: "Blå",     nynorsk: "Blå",     ukrainian: "Синій",           emoji: "🔵" },
+      { bokmal: "Rød",     nynorsk: "Raud",    ukrainian: "Червоний",        emoji: "🔴" },
+      { bokmal: "Grønn",   nynorsk: "Grønn",   ukrainian: "Зелений",         emoji: "🟢" },
+      { bokmal: "Gul",     nynorsk: "Gul",     ukrainian: "Жовтий",          emoji: "🟡" },
+      { bokmal: "Lilla",   nynorsk: "Lilla",   ukrainian: "Фіолетовий",      emoji: "🟣" },
+      { bokmal: "Svart",   nynorsk: "Svart",   ukrainian: "Чорний",          emoji: "⚫" },
+      { bokmal: "Hvit",    nynorsk: "Kvit",    ukrainian: "Білий",           emoji: "⚪" },
+      { bokmal: "Liten",   nynorsk: "Liten",   ukrainian: "Маленький",       emoji: "🔸" },
+      { bokmal: "Stor",    nynorsk: "Stor",    ukrainian: "Великий",         emoji: "🏢" },
+      { bokmal: "Rask",    nynorsk: "Rask",    ukrainian: "Швидкий",         emoji: "⚡" },
+      { bokmal: "Langsom", nynorsk: "Sakte",   ukrainian: "Повільний",       emoji: "🐢" },
+      { bokmal: "Varm",    nynorsk: "Varm",    ukrainian: "Теплий",          emoji: "🔥" },
+      { bokmal: "Kald",    nynorsk: "Kald",    ukrainian: "Холодний",        emoji: "❄️" }
+    ];
+
+    let currentCardIndex = 0;
+    const card = document.getElementById('card');
+    const norwegianWord = document.getElementById('norwegianWord');
+    const ukrainianWord = document.getElementById('ukrainianWord');
+    const flashcardDiv = document.getElementById('flashcard');
+    const languageSelector = document.getElementById('languageSelector');
+
+    // Update flashcard content (emoji + selected variant & Ukrainian translation)
+    function updateCard() {
+      card.classList.remove('flip');
+      const current = flashcards[currentCardIndex];
+      const variant = languageSelector.value;
+      norwegianWord.textContent = current.emoji + " " + current[variant];
+      ukrainianWord.textContent = current.ukrainian;
+    }
+
+    // Flip card on click
+    flashcardDiv.addEventListener('click', function() {
+      card.classList.toggle('flip');
+    });
+
+    // Navigation buttons for flashcards
+    document.getElementById('nextBtn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+      updateCard();
+    });
+    document.getElementById('prevBtn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+      updateCard();
+    });
+    languageSelector.addEventListener('change', updateCard);
+
+    // Update all interface texts based on the current interface language
+    function updateInterface() {
+      const texts = interfaceTexts[interfaceLang];
+      document.getElementById('pageTitle').textContent = texts.title;
+      document.getElementById('variantLabel').textContent = texts.chooseVariant;
+      document.getElementById('flipInstruction').textContent = texts.instruction;
+      document.getElementById('prevBtn').textContent = texts.prev;
+      document.getElementById('nextBtn').textContent = texts.next;
+      document.getElementById('toggleInterfaceBtn').textContent = texts.toggleInterface;
+      document.getElementById('showInstructionsBtn').textContent = texts.instructionsButton;
+      // Also update instructions container if visible
+      if(document.getElementById('instructionsContainer').style.display === 'block'){
+        document.getElementById('instructionsText').textContent = texts.instructionsContent;
+      }
+    }
+
+    // Toggle interface language between Norwegian and Ukrainian
+    document.getElementById('toggleInterfaceBtn').addEventListener('click', function() {
+      interfaceLang = (interfaceLang === "norwegian") ? "ukrainian" : "norwegian";
+      updateInterface();
+    });
+
+    // Show instructions in the current interface language
+    document.getElementById('showInstructionsBtn').addEventListener('click', function() {
+      document.getElementById('instructionsText').textContent = interfaceTexts[interfaceLang].instructionsContent;
+      document.getElementById('instructionsContainer').style.display = 'block';
+    });
+    document.getElementById('closeInstrBtn').addEventListener('click', function() {
+      document.getElementById('instructionsContainer').style.display = 'none';
+    });
+
+    // Initialize
+    updateInterface();
+    updateCard();
+  </script>
+</body>
+</html>
