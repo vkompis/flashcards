@@ -2,11 +2,15 @@
 <html lang="no">
 <head>
   <meta charset="UTF-8">
+  <!-- Meta viewport for mobilvennleg skjem -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lær norsk med flashcards🇳🇴🎉</title>
+  <!-- Bruk Comic Neue frå Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* Body med ein mild gradientbakgrunn */
+    /* Bruk Comic Neue med fallback til Comic Sans MS, Arial og sans-serif */
     body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: 'Comic Neue', 'Comic Sans MS', Arial, sans-serif;
       background: linear-gradient(to right, #a1c4fd, #c2e9fb);
       text-align: center;
       margin: 0;
@@ -127,12 +131,36 @@
     #closeInstrBtn:hover {
       background-color: #c9302c;
     }
+    /* Mobilevennleg styling */
+    @media (max-width: 600px) {
+      .container {
+        width: 90%;
+        padding: 10px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      .word {
+        font-size: 20px;
+      }
+      .emoji {
+        font-size: 36px;
+      }
+      button {
+        padding: 8px 16px;
+        font-size: 14px;
+        margin: 5px;
+      }
+      .selector, .interface-toggle {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
   <h1 id="pageTitle">Lær norsk med flashcards🇳🇴🎉</h1>
   
-  <!-- Globalt grensesnitt: språk­toggle, instruksjonsknapp og rekkefølge­toggle -->
+  <!-- Globalt grensesnitt: språk-togle, instruksjonsknapp og rekkefølgetogle -->
   <div class="interface-toggle">
     <button id="toggleInterfaceBtn">Перейти на українську</button>
     <button id="toggleOrderBtn">Vis ukrainsk fyrst</button>
@@ -156,7 +184,7 @@
           <div class="emoji" id="frontEmoji"></div>
           <div class="word" id="frontWord"></div>
         </div>
-        <!-- Bak­sida med emoji over ordet -->
+        <!-- Baksida med emoji over ordet -->
         <div class="card-side card-back" id="cardBack">
           <div class="emoji" id="backEmoji"></div>
           <div class="word" id="backWord"></div>
@@ -182,7 +210,7 @@
     // Variabel for om det ukrainske ordet skal visast fyrst
     let showUkrainianFirst = false;
 
-    // Tekstar for grensesnittet. Her er "norwegian" omsett til nynorsk.
+    // Tekstar for grensesnittet (nynorsk og ukrainsk)
     const interfaceTexts = {
       norwegian: {
         title: "Lær norsk med flashcards🇳🇴🎉",
@@ -212,7 +240,7 @@
       }
     };
 
-    // Flashcard-data: Over 50 ord med Bokmål, Nynorsk, ukrainsk oversetting og emoji.
+    // Flashcard-data: over 50 ord med Bokmål, Nynorsk, ukrainsk oversetting og emoji.
     const flashcards = [
       { bokmal: "Hund",    nynorsk: "Hund",    ukrainian: "Собака",          emoji: "🐶" },
       { bokmal: "Katt",    nynorsk: "Katt",    ukrainian: "Кіт",             emoji: "🐱" },
@@ -222,7 +250,7 @@
       { bokmal: "Hus",     nynorsk: "Hus",     ukrainian: "Будинок",         emoji: "🏠" },
       { bokmal: "Vann",    nynorsk: "Vatn",    ukrainian: "Вода",            emoji: "💧" },
       { bokmal: "Brød",    nynorsk: "Brød",    ukrainian: "Хліб",            emoji: "🍞" },
-      { bokmal: "Melk",    nynorsk: "Mjólk",   ukrainian: "Молоко",          emoji: "🥛" },
+      { bokmal: "Melk",    nynorsk: "Mjølk",   ukrainian: "Молоко",          emoji: "🥛" },
       { bokmal: "Eple",    nynorsk: "Eple",    ukrainian: "Яблуко",          emoji: "🍎" },
       { bokmal: "Bok",     nynorsk: "Bok",     ukrainian: "Книга",           emoji: "📚" },
       { bokmal: "Stol",    nynorsk: "Stol",    ukrainian: "Стілець",         emoji: "🪑" },
@@ -259,7 +287,7 @@
       { bokmal: "Lilla",   nynorsk: "Lilla",   ukrainian: "Фіолетовий",      emoji: "🟣" },
       { bokmal: "Svart",   nynorsk: "Svart",   ukrainian: "Чорний",          emoji: "⚫" },
       { bokmal: "Hvit",    nynorsk: "Kvit",    ukrainian: "Білий",           emoji: "⚪" },
-      { bokmal: "Liten",   nynorsk: "Liten",   ukrainian: "Maler lik",        emoji: "🔸" },
+      { bokmal: "Liten",   nynorsk: "Liten",   ukrainian: "Oversetting",     emoji: "🔸" },
       { bokmal: "Stor",    nynorsk: "Stor",    ukrainian: "Великий",         emoji: "🏢" },
       { bokmal: "Rask",    nynorsk: "Rask",    ukrainian: "Швидкий",         emoji: "⚡" },
       { bokmal: "Langsom", nynorsk: "Sakte",   ukrainian: "Повільний",       emoji: "🐢" },
@@ -321,7 +349,7 @@
       document.getElementById('toggleInterfaceBtn').textContent = texts.toggleInterface;
       document.getElementById('showInstructionsBtn').textContent = texts.instructionsButton;
       document.getElementById('closeInstrBtn').textContent = texts.closeBtn;
-      // Oppdater rekkefølge­toggle-knappen basert på om det ukrainske ordet vert vist fyrst
+      // Oppdater rekkefølge-togle-knappen basert på om det ukrainske ordet vert vist fyrst
       if (showUkrainianFirst) {
         document.getElementById('toggleOrderBtn').textContent = texts.orderToggleNorwegian;
       } else {
