@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Lær norsk med flashcards🇳🇴🎉</title>
   <style>
-    /* Body with a soft gradient background */
+    /* Body med ein mild gradientbakgrunn */
     body {
       font-family: 'Comic Sans MS', cursive, sans-serif;
       background: linear-gradient(to right, #a1c4fd, #c2e9fb);
@@ -29,7 +29,7 @@
       background-color: #fff;
       padding: 20px;
     }
-    /* Flashcard styling with 3D effect */
+    /* Flashcard-styling med 3D-effekt */
     .flashcard {
       position: relative;
       perspective: 1000px;
@@ -37,7 +37,7 @@
     }
     .card {
       width: 100%;
-      height: 200px;
+      height: 220px;
       transition: transform 0.6s;
       transform-style: preserve-3d;
       position: relative;
@@ -66,13 +66,17 @@
       background-color: #ffecb3;
       transform: rotateY(180deg);
     }
+    /* Emoji: større og plassert over ordet */
+    .emoji {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
     .word {
       font-size: 28px;
       font-weight: bold;
       color: #333;
-      margin: 0 10px;
     }
-    /* Navigation buttons styling */
+    /* Navigasjonsknappar */
     .buttons {
       margin-top: 20px;
     }
@@ -95,7 +99,7 @@
       color: #666;
       margin-top: 10px;
     }
-    /* Instructions container styling */
+    /* Instruksjonsboks */
     #instructionsContainer {
       display: none;
       border: 1px solid #ccc;
@@ -128,15 +132,16 @@
 <body>
   <h1 id="pageTitle">Lær norsk med flashcards🇳🇴🎉</h1>
   
-  <!-- Global interface language toggle -->
+  <!-- Globalt grensesnitt: språk­toggle, instruksjonsknapp og rekkefølge­toggle -->
   <div class="interface-toggle">
     <button id="toggleInterfaceBtn">Перейти на українську</button>
-    <button id="showInstructionsBtn">Vis instruksjoner</button>
+    <button id="toggleOrderBtn">Vis ukrainsk fyrst</button>
+    <button id="showInstructionsBtn">Vis instruksjonar</button>
   </div>
   
-  <!-- Flashcard language variant selector -->
+  <!-- Veljar for norsk variant (Bokmål/Nynorsk) -->
   <div class="selector">
-    <label for="languageSelector" id="variantLabel">Velg språkvariant:</label>
+    <label for="languageSelector" id="variantLabel">Vel språkvariant:</label>
     <select id="languageSelector">
       <option value="bokmal" selected>Bokmål</option>
       <option value="nynorsk">Nynorsk</option>
@@ -146,45 +151,51 @@
   <div class="container">
     <div class="flashcard" id="flashcard">
       <div class="card" id="card">
-        <!-- Front: Displays the Norwegian word with an emoji -->
+        <!-- Framsida med emoji over ordet -->
         <div class="card-side card-front" id="cardFront">
-          <div class="word" id="norwegianWord"></div>
+          <div class="emoji" id="frontEmoji"></div>
+          <div class="word" id="frontWord"></div>
         </div>
-        <!-- Back: Reveals the Ukrainian translation -->
+        <!-- Bak­sida med emoji over ordet -->
         <div class="card-side card-back" id="cardBack">
-          <div class="word" id="ukrainianWord"></div>
+          <div class="emoji" id="backEmoji"></div>
+          <div class="word" id="backWord"></div>
         </div>
       </div>
     </div>
-    <div class="instruction" id="flipInstruction">Klikk på kortet for å snu det og se oversettelsen! 🔄</div>
+    <div class="instruction" id="flipInstruction">Trykk på kortet for å snu det og sjå oversettinga! 🔄</div>
     <div class="buttons">
-      <button id="prevBtn">Forrige</button>
+      <button id="prevBtn">Førre</button>
       <button id="nextBtn">Neste</button>
     </div>
   </div>
   
-  <!-- Hidden instructions container -->
+  <!-- Instruksjonsboks -->
   <div id="instructionsContainer">
     <p id="instructionsText"></p>
     <button id="closeInstrBtn">Lukk</button>
   </div>
   
   <script>
-    // Global interface language (default: norwegian)
+    // Globalt grensesnittsspråk (default: nynorsk)
     let interfaceLang = "norwegian";
+    // Variabel for om det ukrainske ordet skal visast fyrst
+    let showUkrainianFirst = false;
 
-    // Interface text for both languages
+    // Tekstar for grensesnittet. Her er "norwegian" omsett til nynorsk.
     const interfaceTexts = {
       norwegian: {
         title: "Lær norsk med flashcards🇳🇴🎉",
-        chooseVariant: "Velg språkvariant:",
-        instruction: "Klikk på kortet for å snu det og se oversettelsen! 🔄",
-        prev: "Forrige",
+        chooseVariant: "Vel språkvariant:",
+        instruction: "Trykk på kortet for å snu det og sjå oversettinga! 🔄",
+        prev: "Førre",
         next: "Neste",
-        // Toggle button text in Norwegian interface is in Ukrainian
         toggleInterface: "Перейти на українську",
-        instructionsButton: "Vis instruksjoner",
-        instructionsContent: "Instruksjoner: Klikk på kortet for å snu det og se oversettelsen. Bruk knappene 'Forrige' og 'Neste' for å bla gjennom ordene. Du kan også velge språkvariant øverst for å bytte mellom Bokmål og Nynorsk."
+        instructionsButton: "Vis instruksjonar",
+        instructionsContent: "Instruksjonar: Trykk på kortet for å snu det og sjå oversettinga. Bruk knappane 'Førre' og 'Neste' for å bla gjennom orda. Du kan òg velje språkvariant ovanfor for å bytte mellom Bokmål og Nynorsk.",
+        orderToggleUkrainian: "Vis ukrainsk fyrst",
+        orderToggleNorwegian: "Vis norsk fyrst",
+        closeBtn: "Lukk"
       },
       ukrainian: {
         title: "Вчи норвезьку з flashcards🇺🇦🎉",
@@ -194,11 +205,14 @@
         next: "Наступна",
         toggleInterface: "Перемкнути на норвезьку",
         instructionsButton: "Показати інструкції",
-        instructionsContent: "Інструкції: Натисніть на картку, щоб перевернути її та побачити переклад. Використовуйте кнопки 'Попередня' та 'Наступна' для перегляду слів. Також ви можете вибрати мовний варіант зверху для перемикання між Bokmål та Nynorsk."
+        instructionsContent: "Інструкції: Натисніть на картку, щоб перевернути її та побачити переклад. Використовуйте кнопки 'Попередня' та 'Наступна' для перегляду слів. Також ви можете вибрати варіант мови зверху для перемикання між Bokmål та Nynorsk.",
+        orderToggleUkrainian: "Показати українське спочатку",
+        orderToggleNorwegian: "Показати норвезьке спочатку",
+        closeBtn: "Закрити"
       }
     };
 
-    // Flashcard data: Over 50 words with Bokmål, Nynorsk, Ukrainian translations, and an emoji.
+    // Flashcard-data: Over 50 ord med Bokmål, Nynorsk, ukrainsk oversetting og emoji.
     const flashcards = [
       { bokmal: "Hund",    nynorsk: "Hund",    ukrainian: "Собака",          emoji: "🐶" },
       { bokmal: "Katt",    nynorsk: "Katt",    ukrainian: "Кіт",             emoji: "🐱" },
@@ -245,7 +259,7 @@
       { bokmal: "Lilla",   nynorsk: "Lilla",   ukrainian: "Фіолетовий",      emoji: "🟣" },
       { bokmal: "Svart",   nynorsk: "Svart",   ukrainian: "Чорний",          emoji: "⚫" },
       { bokmal: "Hvit",    nynorsk: "Kvit",    ukrainian: "Білий",           emoji: "⚪" },
-      { bokmal: "Liten",   nynorsk: "Liten",   ukrainian: "Маленький",       emoji: "🔸" },
+      { bokmal: "Liten",   nynorsk: "Liten",   ukrainian: "Maler lik",        emoji: "🔸" },
       { bokmal: "Stor",    nynorsk: "Stor",    ukrainian: "Великий",         emoji: "🏢" },
       { bokmal: "Rask",    nynorsk: "Rask",    ukrainian: "Швидкий",         emoji: "⚡" },
       { bokmal: "Langsom", nynorsk: "Sakte",   ukrainian: "Повільний",       emoji: "🐢" },
@@ -255,26 +269,35 @@
 
     let currentCardIndex = 0;
     const card = document.getElementById('card');
-    const norwegianWord = document.getElementById('norwegianWord');
-    const ukrainianWord = document.getElementById('ukrainianWord');
     const flashcardDiv = document.getElementById('flashcard');
     const languageSelector = document.getElementById('languageSelector');
 
-    // Update flashcard content (emoji + selected variant & Ukrainian translation)
+    // Oppdaterar kortinnhaldet med emoji og ord, avhengig av rekkefølga
     function updateCard() {
       card.classList.remove('flip');
       const current = flashcards[currentCardIndex];
       const variant = languageSelector.value;
-      norwegianWord.textContent = current.emoji + " " + current[variant];
-      ukrainianWord.textContent = current.ukrainian;
+      if (showUkrainianFirst) {
+        // Framsida: Ukrainsk med emoji, baksida: Norsk (Bokmål/Nynorsk)
+        document.getElementById('frontEmoji').textContent = current.emoji;
+        document.getElementById('frontWord').textContent = current.ukrainian;
+        document.getElementById('backEmoji').textContent = current.emoji;
+        document.getElementById('backWord').textContent = current[variant];
+      } else {
+        // Framsida: Norsk (Bokmål/Nynorsk) med emoji, baksida: Ukrainsk
+        document.getElementById('frontEmoji').textContent = current.emoji;
+        document.getElementById('frontWord').textContent = current[variant];
+        document.getElementById('backEmoji').textContent = current.emoji;
+        document.getElementById('backWord').textContent = current.ukrainian;
+      }
     }
 
-    // Flip card on click
+    // Flip kortet ved klikk
     flashcardDiv.addEventListener('click', function() {
       card.classList.toggle('flip');
     });
 
-    // Navigation buttons for flashcards
+    // Navigasjonsknappar
     document.getElementById('nextBtn').addEventListener('click', function(e) {
       e.stopPropagation();
       currentCardIndex = (currentCardIndex + 1) % flashcards.length;
@@ -287,7 +310,7 @@
     });
     languageSelector.addEventListener('change', updateCard);
 
-    // Update all interface texts based on the current interface language
+    // Oppdaterer alle grensesnittstekstar basert på gjeldande språk
     function updateInterface() {
       const texts = interfaceTexts[interfaceLang];
       document.getElementById('pageTitle').textContent = texts.title;
@@ -297,19 +320,33 @@
       document.getElementById('nextBtn').textContent = texts.next;
       document.getElementById('toggleInterfaceBtn').textContent = texts.toggleInterface;
       document.getElementById('showInstructionsBtn').textContent = texts.instructionsButton;
-      // Also update instructions container if visible
-      if(document.getElementById('instructionsContainer').style.display === 'block'){
+      document.getElementById('closeInstrBtn').textContent = texts.closeBtn;
+      // Oppdater rekkefølge­toggle-knappen basert på om det ukrainske ordet vert vist fyrst
+      if (showUkrainianFirst) {
+        document.getElementById('toggleOrderBtn').textContent = texts.orderToggleNorwegian;
+      } else {
+        document.getElementById('toggleOrderBtn').textContent = texts.orderToggleUkrainian;
+      }
+      // Oppdater instruksjonstekst dersom instruksjonsboksen er open
+      if (document.getElementById('instructionsContainer').style.display === 'block') {
         document.getElementById('instructionsText').textContent = texts.instructionsContent;
       }
     }
 
-    // Toggle interface language between Norwegian and Ukrainian
+    // Bytt mellom nynorsk (norwegian) og ukrainsk
     document.getElementById('toggleInterfaceBtn').addEventListener('click', function() {
       interfaceLang = (interfaceLang === "norwegian") ? "ukrainian" : "norwegian";
       updateInterface();
     });
 
-    // Show instructions in the current interface language
+    // Toggle rekkefølge: vis ukrainsk fyrst eller norsk fyrst
+    document.getElementById('toggleOrderBtn').addEventListener('click', function() {
+      showUkrainianFirst = !showUkrainianFirst;
+      updateCard();
+      updateInterface();
+    });
+
+    // Vis instruksjonar i gjeldande grensesnittsspråk
     document.getElementById('showInstructionsBtn').addEventListener('click', function() {
       document.getElementById('instructionsText').textContent = interfaceTexts[interfaceLang].instructionsContent;
       document.getElementById('instructionsContainer').style.display = 'block';
@@ -318,7 +355,7 @@
       document.getElementById('instructionsContainer').style.display = 'none';
     });
 
-    // Initialize
+    // Initialisering
     updateInterface();
     updateCard();
   </script>
